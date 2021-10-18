@@ -10,6 +10,7 @@ const table_width=3.0;
 let table_height;
 let verticesNum=0;
 const grid_spacing= 0.05;
+const canvas = document.getElementById("gl-canvas");
 
 function animate(time)
 {
@@ -28,7 +29,7 @@ function animate(time)
 
 function setup(shaders)
 {
-    const canvas = document.getElementById("gl-canvas");
+    //const canvas = document.getElementById("gl-canvas");
 
     canvas.setAttribute("width", window.innerWidth);
     canvas.setAttribute("height", window.innerHeight);
@@ -46,6 +47,17 @@ function setup(shaders)
         }
     }
 
+    window.addEventListener("click",function(event){
+        // Start by getting x and y coordinates inside the canvas element
+
+        var x = event.offsetX;
+        var y = event.offsetY;
+        x = ((x-table_width)- canvas.innerWidth/2)/(canvas.innerWidth/2);
+        y =(canvas.innerHeight/2-(y-table_height))/(canvas.innerHeight/2);
+        console.log(canvas.innerHeight);
+        
+        
+   } )
     gl = UTILS.setupWebGL(canvas);
 
     program = UTILS.buildProgramFromSources(gl, shaders["shader1.vert"], shaders["shader1.frag"]);
