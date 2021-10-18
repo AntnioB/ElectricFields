@@ -45,9 +45,9 @@ function setup(shaders)
     for(let x = -table_width/2+grid_spacing/2; x <= table_width/2+grid_spacing/2; x += grid_spacing) {
         for(let y = -table_height/2+grid_spacing/2; y <= table_height/2+grid_spacing/2; y += grid_spacing) {
             vertices.push(MV.vec2(x, y));
-            let red = -x/table_width*0.5+0.5;
-            let green = x/table_width*0.5+0.5
-            let blue = y/table_height*0.5+0.5;
+            let red = -x/(table_width/2+grid_spacing/2)*0.5+0.5;
+            let green = x/(table_width/2+grid_spacing/2)*0.5+0.5
+            let blue = y/(table_height/2+grid_spacing/2)*0.5+0.5;
             colors.push(MV.vec4( red, green, blue,1.0));
             verticesNum++;
         }
