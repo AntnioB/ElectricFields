@@ -11,6 +11,7 @@ const table_width=3.0;
 let table_height;
 let verticesNum=0;
 const grid_spacing= 0.05;
+let charges=[];
 
 function animate(time)
 {
@@ -42,6 +43,13 @@ function setup(shaders)
         canvas.setAttribute("height", window.innerHeight);
         table_height = table_width*window.innerHeight/window.innerWidth;
     })
+
+    window.addEventListener("click", function(event){
+        let x = 2*event.offsetX/canvas.width-1;
+        let y = 2*(canvas.height-event.offsetY)/canvas.height-1;
+        charges.push(MV.vec2(x, y))
+    })
+
     for(let x = -table_width/2+grid_spacing/2; x <= table_width/2+grid_spacing/2; x += grid_spacing) {
         for(let y = -table_height/2+grid_spacing/2; y <= table_height/2+grid_spacing/2; y += grid_spacing) {
             vertices.push(MV.vec2(x, y));
@@ -75,6 +83,10 @@ function setup(shaders)
     const vColor = gl.getAttribLocation(program,"vColor");
     gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vColor);
+
+    const chargeBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, chargeBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, MV.flatten(charges), gl.STATIC_DRAW);
     
     window.requestAnimationFrame(animate);
 
