@@ -6,6 +6,7 @@ let gl;
 
 let program;
 let vertices=[];
+let colors=[];
 const table_width=3.0;
 let table_height;
 let verticesNum=0;
@@ -22,6 +23,8 @@ function animate(time)
 
     const dx2 = gl.getUniformLocation(program, "utable_height");
     gl.uniform1f(dx2, table_height);
+
+    
 
     gl.drawArrays(gl.POINTS,0,verticesNum);
 }
@@ -42,6 +45,10 @@ function setup(shaders)
     for(let x = -table_width/2+grid_spacing/2; x <= table_width/2+grid_spacing/2; x += grid_spacing) {
         for(let y = -table_height/2+grid_spacing/2; y <= table_height/2+grid_spacing/2; y += grid_spacing) {
             vertices.push(MV.vec2(x, y));
+            let red = -x/table_width*0.5+0.5;
+            let green = x/table_width*0.5+0.5
+            let blue = y/table_height*0.5+0.5;
+            colors.push(MV.vec4( red, green, blue,1.0));
             verticesNum++;
         }
     }
@@ -60,6 +67,14 @@ function setup(shaders)
     const vPosition = gl.getAttribLocation(program,"vPosition");
     gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0,0);
     gl.enableVertexAttribArray(vPosition);
+    
+    const cBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, MV.flatten(colors), gl.STATIC_DRAW);
+
+    const vColor = gl.getAttribLocation(program,"vColor");
+    gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(vColor);
     
     window.requestAnimationFrame(animate);
 
