@@ -6,12 +6,15 @@ let gl;
 
 let program;
 let vertices=[];
-let colors=[];
+//let colors=[];
 const table_width=3.0;
 let table_height;
 let verticesNum=0;
 const grid_spacing= 0.05;
 let charges=[];
+let chargesNum=0;
+
+const maxChargeNum = 20;
 
 function animate(time)
 {
@@ -25,9 +28,7 @@ function animate(time)
     const dx2 = gl.getUniformLocation(program, "utable_height");
     gl.uniform1f(dx2, table_height);
 
-    
-
-    gl.drawArrays(gl.POINTS,0,verticesNum);
+    gl.drawArrays(gl.POINTS,0,verticesNum+chargesNum);
 }
 
 function setup(shaders)
@@ -44,19 +45,14 @@ function setup(shaders)
         table_height = table_width*window.innerHeight/window.innerWidth;
     })
 
-    window.addEventListener("click", function(event){
-        let x = 2*event.offsetX/canvas.width-1;
-        let y = 2*(canvas.height-event.offsetY)/canvas.height-1;
-        charges.push(MV.vec2(x, y))
-    })
-
     for(let x = -table_width/2+grid_spacing/2; x <= table_width/2+grid_spacing/2; x += grid_spacing) {
         for(let y = -table_height/2+grid_spacing/2; y <= table_height/2+grid_spacing/2; y += grid_spacing) {
             vertices.push(MV.vec2(x, y));
-            let red = -x/(table_width/2+grid_spacing/2)*0.5+0.5;
+            /**let red = -x/(table_width/2+grid_spacing/2)*0.5+0.5;
             let green = x/(table_width/2+grid_spacing/2)*0.5+0.5
             let blue = y/(table_height/2+grid_spacing/2)*0.5+0.5;
             colors.push(MV.vec4( red, green, blue,1.0));
+            */
             verticesNum++;
         }
     }
@@ -68,7 +64,7 @@ function setup(shaders)
     gl.viewport(0, 0, canvas.clientWidth, canvas.height);
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
-    const vBuffer = gl.createBuffer();
+    var vBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, MV.flatten(vertices), gl.STATIC_DRAW);
 
@@ -76,17 +72,29 @@ function setup(shaders)
     gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0,0);
     gl.enableVertexAttribArray(vPosition);
     
-    const cBuffer = gl.createBuffer();
+    /**const cBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, MV.flatten(colors), gl.STATIC_DRAW);
 
-    const vColor = gl.getAttribLocation(program,"vColor");
-    gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(vColor);
-
-    const chargeBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, chargeBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, MV.flatten(charges), gl.STATIC_DRAW);
+    //const vColor = gl.getAttribLocation(program,"vColor");
+    //gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
+    //gl.enableVertexAttribArray(vColor);
+    */
+    
+    window.addEventListener("click", function(event){
+        let x = (-1+(2*event.offsetX/canvas.width))*table_width/2;
+        let y = (-1+(2*(canvas.height-event.offsetY)/canvas.height))*table_height/2;
+        charges.push(MV.vec2(x, y));
+        chargesNum++;
+        const chargeBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, chargeBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, (verticesNum+maxChargeNum)*8, gl.STATIC_DRAW);
+        gl.bufferSubData(gl.ARRAY_BUFFER, 0 ,MV.flatten(vertices));
+        gl.bufferSubData(gl.ARRAY_BUFFER, verticesNum*8, MV.flatten(charges));
+        const vPosition2 = gl.getAttribLocation(program,"vPosition");
+        gl.vertexAttribPointer(vPosition2, 2, gl.FLOAT, false, 0,0);
+        gl.enableVertexAttribArray(vPosition2);
+    })
     
     window.requestAnimationFrame(animate);
 
