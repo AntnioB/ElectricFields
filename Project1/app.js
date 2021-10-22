@@ -13,7 +13,6 @@ let verticesNum=0;
 const grid_spacing= 0.05;
 let charges=[];
 let chargesNum=0;
-let vBuffer;
 const maxChargeNum = 20;
 
 function setup(shaders)
@@ -50,8 +49,14 @@ function setup(shaders)
         if(chargesNum<maxChargeNum){
             let x = (-1+(2*event.offsetX/canvas.width))*table_width/2;
             let y = (-1+(2*(canvas.height-event.offsetY)/canvas.height))*table_height/2;
-            charges.push(MV.vec2(x, y));
-            chargesNum++;
+            if(event.shiftKey){
+                charges.push(MV.vec2(x,y));
+                chargesNum++;
+            }
+            else{
+                charges.push(MV.vec2(x, y));
+                chargesNum++;
+            }
         }
         else {}
     })
@@ -83,16 +88,6 @@ function animate(time)
     bufferInit();
     window.requestAnimationFrame(animate);
     gl.clear(gl.COLOR_BUFFER_BIT);
-
-    window.addEventListener("click", function(event){
-        if(chargesNum<maxChargeNum){
-            let x = (-1+(2*event.offsetX/canvas.width))*table_width/2;
-            let y = (-1+(2*(canvas.height-event.offsetY)/canvas.height))*table_height/2;
-            charges.push(MV.vec2(x, y));
-            chargesNum++;
-        }
-        else {}
-    })
     
     //Grid
     gl.useProgram(program1);
@@ -105,9 +100,9 @@ function animate(time)
     //Charges
     bufferInit2();
     gl.useProgram(program2);
-    const dx3 = gl.getUniformLocation(program1,"utable_width2");
+    const dx3 = gl.getUniformLocation(program2,"utable_width2");
     gl.uniform1f(dx3,table_width);
-    const dx4 = gl.getUniformLocation(program1,"utable_height2");
+    const dx4 = gl.getUniformLocation(program2,"utable_height2");
     gl.uniform1f(dx4,table_height);
     gl.drawArrays(gl.POINTS,0,chargesNum);
 }
