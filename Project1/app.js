@@ -83,6 +83,13 @@ function bufferInit2(){
     gl.enableVertexAttribArray(vPosition);
 }
 
+function rotate(time, charge){
+    let x = charge[0];
+    let y = charge[1];
+    let radius = Math.sqrt(Math.pow(x,2)+Math.pow(y,2));
+    return [Math.cos(time/1000)*(radius/table_height),Math.sin(time/1000)*radius];
+}
+
 function animate(time)
 {
     bufferInit();
@@ -104,7 +111,12 @@ function animate(time)
     gl.uniform1f(dx3,table_width);
     const dx4 = gl.getUniformLocation(program2,"utable_height2");
     gl.uniform1f(dx4,table_height);
-    gl.drawArrays(gl.POINTS,0,chargesNum);
+    for(let i = 0; i<chargesNum;i++){
+        let rotation =rotate(time, charges[i]); 
+        var rotationL = gl.getUniformLocation(program2,"rotation");
+        gl.uniform2fv(rotationL,rotation);
+        gl.drawArrays(gl.POINTS,i,1);
+    }
 }
 
 UTILS.loadShadersFromURLS(["shader1.vert", "shader1.frag", "shader2.vert", "shader2.frag"]).then(s => setup(s));
