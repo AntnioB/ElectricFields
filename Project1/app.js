@@ -1,5 +1,6 @@
 import * as UTILS from '../../libs/utils.js';
 import * as MV from '../../libs/MV.js'
+import * as THREE from '../../libs/three.module.js'
 
 /** @type {WebGLRenderingContext} */
 let gl;
@@ -36,6 +37,8 @@ function setup(shaders)
 
     for(let x = -table_width/2+grid_spacing/2; x <= table_width/2+grid_spacing/2; x += grid_spacing) {
         for(let y = -table_height/2+grid_spacing/2; y <= table_height/2+grid_spacing/2; y += grid_spacing) {
+            vertices.push(MV.vec2(x, y));
+            verticesNum++;
             vertices.push(MV.vec2(x, y));
             verticesNum++;
         }
@@ -83,16 +86,19 @@ function bufferInit2(){
     const cBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER,cBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, MV.flatten(charges),gl.STATIC_DRAW);
-    const vPosition= gl.getAttribLocation(program2,"vPosition");
-    gl.vertexAttribPointer(vPosition,2,gl.FLOAT,false,0,0);
-    gl.enableVertexAttribArray(vPosition);
+    //const vPosition= gl.getAttribLocation(program2,"vPosition");
+    //gl.vertexAttribPointer(vPosition,2,gl.FLOAT,false,0,0);
+    //gl.enableVertexAttribArray(vPosition);
 }
 
-function rotate(time, charge){
+function rotate(charge,value){
     let x = charge[0];
     let y = charge[1];
-    let radius = Math.sqrt(Math.pow(x,2)+Math.pow(y,2));
-    return [Math.cos(time/1000)*(radius),Math.sin(time/1000)*(radius)];
+    let vcharge = new THREE.Vector2(x,y);
+    vcharge.rotateAround(new THREE.Vector2(0,0),Math.PI/500*value);
+    charge[0] = vcharge.getComponent(0);
+    charge[1] = vcharge.getComponent(1);
+    return charge;
 }
 
 function calculateEF(vertice){
@@ -110,11 +116,11 @@ function calculateEF(vertice){
 
 function animate(time)
 {
-    bufferInit();
     window.requestAnimationFrame(animate);
     gl.clear(gl.COLOR_BUFFER_BIT);
     
     //Grid
+    bufferInit();
     gl.useProgram(program1);
     const dx1 = gl.getUniformLocation(program1,"utable_width");
     gl.uniform1f(dx1,table_width);
@@ -123,7 +129,7 @@ function animate(time)
     for(let i = 0; i <verticesNum;i++){
         const eField = gl.getUniformLocation(program1,"eField");
         gl.uniform1f(eField, calculateEF(vertices[i]));
-        gl.drawArrays(gl.POINTS,i,1);
+        gl.drawArrays(gl.LINES,i*2,2);
     }
 
     //Charges
@@ -134,7 +140,7 @@ function animate(time)
     const dx4 = gl.getUniformLocation(program2,"utable_height2");
     gl.uniform1f(dx4,table_height);
     for(let i = 0; i<chargesNum;i++){
-        let rotation =rotate(time, charges[i]); 
+        let rotation =rotate(charges[i],vCharges[i]); 
         var rotationL = gl.getUniformLocation(program2,"rotation");
         gl.uniform2fv(rotationL,rotation);
         gl.drawArrays(gl.POINTS,i,1);
