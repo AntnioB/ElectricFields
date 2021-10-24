@@ -18,6 +18,7 @@ let chargesNum=0;
 const MAX_CHARGES = 20;
 const qCharge=1;
 const KE = 8.988*Math.pow(10,9);
+let opacity=1.0;
 
 function setup(shaders)
 {
@@ -67,6 +68,15 @@ function setup(shaders)
             }
         }
         else {}
+    })
+
+    window.addEventListener("keyup", function(event){
+        if(event.keyCode==32){
+            if(opacity==1.0)
+                opacity=0.0;
+            else
+                opacity=1.0;
+        }
     })
     
     window.requestAnimationFrame(animate);
@@ -135,7 +145,8 @@ function animate(time)
         let rotation =rotate(charges[i],vCharges[i]); 
         var rotationL = gl.getUniformLocation(program2,"rotation");
         gl.uniform2fv(rotationL,rotation);
-        gl.drawArrays(gl.POINTS,i,1);
+        if(opacity==1.0)
+            gl.drawArrays(gl.POINTS,i,1);
     }
 }
 
