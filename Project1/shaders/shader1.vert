@@ -1,11 +1,12 @@
+attribute vec4 vPosition;
+const int MAX_CHARGES=20;
+const float KE = 8.988; 
+const float GRID_SPACING= 0.05;
 uniform float utable_width;
 uniform float utable_height;
-attribute vec4 vPosition;
-varying vec4 fColor;
-const int MAX_CHARGES=20;
 uniform vec2 uCharges[MAX_CHARGES];
 uniform float uVCharges[MAX_CHARGES];
-const float KE = 8.988; 
+varying vec4 fColor;
 
 #define TWOPI 6.28318530718
 
@@ -35,7 +36,7 @@ float getLength(vec2 vector){
 }
 
 vec2 setLength(vec2 vector,float length){
-    vector = vector / vec2(sqrt(vector.x*vector.x+vector.y*vector.y),sqrt(vector.x*vector.x+vector.y*vector.y));
+    vector = normalize(vector);
     vector = vector * vec2(length,length);
     return vector;
 }
@@ -43,9 +44,7 @@ vec2 calculateEfield(vec4 vPosition, vec2 chargeP,float vCharge){
     vec2 eField = vec2(0.0,0.0);
     eField.x= vPosition.x-chargeP.x;
     eField.y= vPosition.y-chargeP.y;
-    float fieldV = KE * vCharge/(pow(vPosition.x-chargeP.x,2.0) + pow(vPosition.y-chargeP.y,2.0))/500.0;
-    if(fieldV>0.25) fieldV = 0.25;
-    else if(fieldV<-0.25) fieldV = -0.25;
+    float fieldV = KE * vCharge/(pow(eField.x,2.0) + pow(eField.y,2.0))/400.0;
     eField = setLength(eField,fieldV);
     return eField;
 }
@@ -59,11 +58,12 @@ void main()
         }
     if(vPosition.z==0.0){
         gl_Position = vPosition/ vec4(utable_width/2.0, utable_height/2.0,1.0,1.0);
+        fColor=vec4(0.0,0.0,0.0,1.0);
     }
     else{
-        if(getLength(eField)>0.25) eField = setLength(eField,0.25);
+        if(getLength(eField)>GRID_SPACING*5.0/utable_width) eField = setLength(eField,GRID_SPACING*5.0/utable_width);
         gl_Position = (vPosition + vec4(eField,0.0,0.0)) / vec4(utable_width/2.0, utable_height/2.0,1.0,1.0);
         gl_Position.z=0.0;
+        fColor=colorize(eField);
     }
-    fColor=colorize(eField);
 }

@@ -8,16 +8,15 @@ let gl;
 let program1;
 let program2;
 let vertices=[];
+let verticesNum=0;
 const table_width=3.0;
 let table_height;
-let verticesNum=0;
 const grid_spacing= 0.05;
 let charges=[];
 let vCharges=[];
 let chargesNum=0;
 const MAX_CHARGES = 20;
 const qCharge=1;
-const KE = 8.988*Math.pow(10,9);
 let opacity=1.0;
 
 function setup(shaders)
