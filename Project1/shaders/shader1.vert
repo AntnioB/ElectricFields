@@ -27,7 +27,7 @@ vec3 hsv2rgb(vec3 c)
 vec4 colorize(vec2 f)
 {
     float a = atan(f.y, f.x);
-    return vec4(angle_to_hue(a-TWOPI), 1.);
+    return vec4(angle_to_hue(a-TWOPI), 1.0);
 }
 
 float getLength(vec2 vector){
@@ -52,18 +52,18 @@ vec2 calculateEfield(vec4 vPosition, vec2 chargeP,float vCharge){
 
 void main()
 {
+    vec2 eField= vec2(0.0,0.0);
     gl_PointSize=4.0;
+    for(int i = 0; i<MAX_CHARGES;i++){
+            eField = eField + calculateEfield(vPosition, uCharges[i],uVCharges[i]);
+        }
     if(vPosition.z==0.0){
         gl_Position = vPosition/ vec4(utable_width/2.0, utable_height/2.0,1.0,1.0);
     }
     else{
-        vec2 eField= vec2(0.0,0.0);
-        for(int i = 0; i<MAX_CHARGES;i++){
-            eField = eField + calculateEfield(vPosition, uCharges[i],uVCharges[i]);
-        }
         if(getLength(eField)>0.25) eField = setLength(eField,0.25);
         gl_Position = (vPosition + vec4(eField,0.0,0.0)) / vec4(utable_width/2.0, utable_height/2.0,1.0,1.0);
         gl_Position.z=0.0;
     }
-    fColor=colorize(vec2(gl_Position.x,gl_Position.y));
+    fColor=colorize(eField);
 }

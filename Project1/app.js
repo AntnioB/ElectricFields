@@ -67,7 +67,7 @@ function setup(shaders)
                 vCharges.push(qCharge);
             }
         }
-        else {}
+        else {alert("Max number of charges reached.")}
     })
 
     window.addEventListener("keyup", function(event){
@@ -98,10 +98,10 @@ function bufferInit(){
 function bufferInit2(){
     const cBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER,cBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, MV.flatten(charges),gl.STATIC_DRAW);
-    //const vPosition= gl.getAttribLocation(program2,"vPosition");
-    //gl.vertexAttribPointer(vPosition,2,gl.FLOAT,false,0,0);
-    //gl.enableVertexAttribArray(vPosition);
+    gl.bufferData(gl.ARRAY_BUFFER, MV.flatten(vCharges),gl.STATIC_DRAW);
+    const vCharge= gl.getAttribLocation(program2,"vCharge");
+    gl.vertexAttribPointer(vCharge,1,gl.FLOAT,false,0,0);
+    gl.enableVertexAttribArray(vCharge);
 }
 
 function rotate(charge,value){
